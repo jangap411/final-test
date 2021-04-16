@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/main.css">
+    <title>Home</title>
+</head>
+<body>
+    <main>
+        <!-- left column -->
+        <%- include('./partials/left-col') %>
+    <!-- left column end -->
+        <div class="middle-col">
+<div class="create-tweet">
+ <div class="home-title">
+     <!-- <h1 class="home-title">Home</h1> -->
+     <h1>HEY</h1>
+    <h2>welcome to the site</h2>
+    <h3>the messaging site</h3>
+    <h4>make an account, login, post a message</h4>
+ </div>
+        <form action="/message" method="POST">
+          <div class="post-item">
+            <img src="images/avatar.jpeg" alt="" srcset="" class="avatar">
+            <input type="text" name="content" required placeholder="Send a message"> <br> <br>
+          </div>
+          <button type="submit">Send</button>
+        </form>
+      </div>
+            
+    
+            <h2>Messages</h2>
+    
+            <% for (let message of locals.messages) { %> 
+                <div class="tweet-content">
+                    <div class="img-avatar">
+                        <img src="images/avatar.jpeg" alt="" srcset="" class="avatar">
+                    </div>
+                    <div class="tweet">
+                        <b><%= message.dataValues.User.dataValues.username %> </b> <span><%= message.dataValues.createdAt.toDateString() %></span>
+                        <p>
+                            <%= message.dataValues.content %> 
+                        </p>
+                        <form action="/like" method="post">
+                            1
+                            <button type="submit" id="like-btn">&#128077;</button>
+                        </form>
+                    </div>
+                </div>
+            <% } %>
+
+        </div>
+        <!-- right col start -->
+        <%- include('./partials/right-col') %>
+    </main>
+</body>
+</html>
