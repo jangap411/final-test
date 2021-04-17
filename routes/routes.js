@@ -82,7 +82,7 @@ router.get("/message", async function (req, res) {
 
   let verifyToken = jwt.verify(token, "theSecret");
 
-  if (verifyToken) {
+  if (token) {
     res.render("message");
   } else {
     res.render("login", dataMsg);
@@ -132,7 +132,28 @@ router.get("/error", function (req, res) {
 // });
 
 router.post("/like", async (req, res) => {
+  let { id } = req.body;
   console.log("like");
+
+  let message = await Message.findOne({ where: { id: id } });
+
+  if (message) {
+    let like = await Message.update(
+      {
+        likes: parseInt(message.likes) + 1,
+      },
+      {
+        where: { id: message.id },
+        returning: true,
+        plain: true,
+      }
+    );
+    if (like) {
+      res.redirect("/");
+    } else {
+      res.send("error");
+    }
+  }
 });
 
 router.get("/logout", (req, res) => {

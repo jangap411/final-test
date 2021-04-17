@@ -21,8 +21,8 @@ Message.init(
     content: DataTypes.STRING,
     time: DataTypes.TIME,
     likes: {
-      type: DataTypes.STRING,
-      default: 0,
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
   },
   { sequelize }

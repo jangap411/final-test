@@ -44,8 +44,10 @@
                             <%= message.dataValues.content %> 
                         </p>
                         <form action="/like" method="post">
+                            <input type="text" name="id" value='<%= message.dataValues.id %>'style="display:none">
                             <button type="submit" id="like-btn">&#128077;</button>
-                            1
+                            <span><%= message.dataValues.likes %></span>
+                            
                         </form>
                     </div>
                 </div>
