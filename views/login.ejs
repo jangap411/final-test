@@ -10,8 +10,9 @@
 <body>
     <main>
         <h1>Login to your account</h1>
-         <%- include('./partials/breadcrumb')%>
+        <%- include('./partials/breadcrumb')%>
         <form action="/login" method="POST">
+            <h4><%= msg %></h4>
             username: <input type="text" name="username"><br>
             password: <input type="text" name="password"><br>
             <button>hope this works</button>
