@@ -39,7 +39,7 @@
                         <img src="images/avatar.jpeg" alt="" srcset="" class="avatar">
                     </div>
                     <div class="tweet">
-                        <b><%= message.dataValues.User.dataValues.username %> </b> <span><%= message.dataValues.createdAt.toDateString() %></span>
+                        <b><%= message.dataValues.User.dataValues.username %> </b> <span><%= message.dataValues.createdAt.toDateString() %>, <%= message.dataValues.time %></span>
                         <p>
                             <%= message.dataValues.content %> 
                         </p>
