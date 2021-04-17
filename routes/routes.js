@@ -9,38 +9,17 @@ let dataMsg = {
 };
 
 router.get("/", async function (req, res) {
-  try {
-    let { token } = req.cookies;
-    console.log("\nreq.body:--->", req.body, "\n");
-    let payload = jwt.verify(token, "theSecret");
+  let messages = await Message.findAll({
+    include: User,
+    order: [["id", "DESC"]],
+  });
 
-    console.log("\nverify token--->", payload, "\n");
+  let data = { messages };
 
-    // if (token) {
-    //   return res.send("cookies found");
-    // }
-
-    let messages = await Message.findAll({
-      include: User,
-      order: [["id", "DESC"]],
-    });
-
-    let data = { messages };
-
-    console.log(data);
-
-    if (payload) {
-      res.render("index", data);
-    } else {
-      res.render("login", dataMsg);
-    }
-  } catch (e) {
-    console.log("\nGet home catch--->", e, "\n");
-    res.render("login", dataMsg);
-  }
+  res.render("index", data);
 });
 
-router.get("/createUser", async function (req, res) {
+router.get("/createUser", function (req, res) {
   res.render("createUser");
 });
 
@@ -48,18 +27,22 @@ router.post("/createUser", async function (req, res) {
   let { username, password } = req.body;
 
   try {
-    await User.create({
+    let user = await User.create({
       username: username,
       password: password,
       role: "user",
     });
+
+    if (user) {
+      dataMsg.msg = "Account Created Please login";
+      redirect("/login", dataMsg);
+    } else {
+      dataMsg.msg = "Error creating account";
+      redirect("/login", dataMsg);
+    }
   } catch (e) {
-    console.log(e);
+    console.log("\ncatch creating user", e, "\n");
   }
-
-  dataMsg.msg = "Account Created, please login!";
-
-  res.render("login", dataMsg);
 });
 
 router.get("/login", function (req, res) {
@@ -74,10 +57,7 @@ router.post("/login", async function (req, res) {
       where: { username },
     });
 
-    console.log("\nUser db---.", user, "\n");
-    console.log("\nUser id db--->", user.id, "\n");
-
-    if (user && user.password === password) {
+    if (user && user.password == password) {
       let data = {
         username: username,
         role: user.role,
@@ -85,63 +65,58 @@ router.post("/login", async function (req, res) {
       };
 
       let token = jwt.sign(data, "theSecret");
-      res.cookie(token, { maxAge: 5 * 60 * 1000 });
-      console.log("\nUser", user, "\n");
-      console.log("\nSign token", token, "\n");
+      res.cookie("token", token);
       res.redirect("/");
     } else {
-      dataMsg.msg = "Invalid Username or password";
-      res.render("login", dataMsg);
+      redirect("/error");
     }
   } catch (e) {
-    console.log(e);
+    console.log("\ncatch login user", e, "\n");
   }
 });
 
 router.get("/message", async function (req, res) {
   let token = req.cookies.token;
-  console.log("\nreq.body.token", token, "\n");
+
   let verifyToken = jwt.verify(token, "theSecret");
-  console.log("\nverifytoken", verifyToken, "\n");
+
   if (verifyToken) {
-    // very bad, no verify, don't do this
     res.render("message");
   } else {
-    dataMsg.msg = "Invalid token used";
     res.render("login", dataMsg);
   }
 });
 
 router.post("/message", async function (req, res) {
-  let { token } = req.cookies;
+  let { token } = res.cookies;
   let { content } = req.body;
-  console.log("\nreq.body:--->", req.body, "\n");
+  let timeCreated = new Date();
 
   try {
-    let payload = jwt.verify(token, "theSecret");
-    if (payload) {
+    if (token) {
+      let payload = jwt.verify(token, "theSecret");
+
       let user = await User.findOne({
         where: { username: payload.username },
       });
 
-      let msg = await Message.create({
-        content,
-        time: new Date(),
-        UserId: user.id,
-      });
+      if (user) {
+        let msg = await Message.create({
+          content: content,
+          time: timeCreated.toLocaleTimeString(),
+          userId: user.id,
+        });
 
-      if (msg) {
-        res.redirect("/");
-      } else {
-        res.sendStatus(500);
+        if (msg) {
+          res.redirect("/");
+        } else {
+          res.redirect("/error");
+        }
       }
-    } else {
-      res.redirect("/login");
     }
   } catch (e) {
-    res.statusCode = 500;
-    console.error(e);
-    res.redirect("/login");
+    console.error("\nCatch create message --->", e, "\n");
+    redirect("/error");
   }
 });
 
@@ -204,34 +179,5 @@ router.get("/users", async (req, res) => {
     console.error(e);
   }
 });
-
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  // const authHeader = req.headers.Authorization;
-
-  console.log("\nauthHeader", authHeader, "\n");
-
-  const token = authHeader && authHeader.split(" ")[1];
-  console.log("\ntoken Middleware", token, "\n");
-
-  if (token == null) {
-    console.info("\nNull token\n");
-    dataMsg.msg = "Your token has expired. Please login again";
-    // res.statusCode = 401;
-    // res.render("login", dataMsg);
-  }
-
-  jwt.verify(token, "theSecret", (err, data) => {
-    if (err) {
-      console.info("\n token Error\n");
-      // res.statusCode = 403;
-      dataMsg.msg = "Your token has expired. Please login again";
-      res.render("login", dataMsg);
-    }
-    console.log("\nreq.data---->", data, "\n");
-    req.data = data;
-    next();
-  });
-}
 
 module.exports = router;
