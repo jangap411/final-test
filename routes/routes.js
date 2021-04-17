@@ -1,7 +1,6 @@
 const { User, Message } = require("../models/models.js");
 const jwt = require("jsonwebtoken");
 const { Router } = require("express");
-// const { post } = require("../../../twitter/clone/submit2/routes/routes.js");
 const router = Router();
 
 let dataMsg = {
@@ -15,9 +14,6 @@ router.get("/", async function (req, res) {
   });
 
   let data = { message };
-
-  console.log("\nMessage data---->", data, "\n");
-
   res.render("index", data);
 });
 
@@ -70,7 +66,9 @@ router.post("/login", async function (req, res) {
       res.cookie("token", token);
       res.redirect("/");
     } else {
-      redirect("/error");
+      dataMsg.msg =
+        "Invalid Username or password.\nTry signup to access this site";
+      res.redirect("/login");
     }
   } catch (e) {
     console.log("\ncatch login user", e, "\n");
@@ -85,13 +83,13 @@ router.get("/message", async function (req, res) {
   if (token) {
     res.render("message");
   } else {
+    dataMsg.msg = "Please login. your session has expired";
     res.render("login", dataMsg);
   }
 });
 
 router.post("/message", async function (req, res) {
   let { token } = req.cookies;
-  console.log("\nreq.body----->", req.body, "\nreq.cookies", req.cookies, "\n");
   let { content } = req.body;
   let timeCreated = new Date();
 
@@ -158,50 +156,9 @@ router.post("/like", async (req, res) => {
 
 router.get("/logout", (req, res) => {
   const { token } = req.cookies;
-  // const authHeader = req.headers.Authorization;
-
-  console.log("\ntoken", token, "\n");
-
-  // const token = authHeader && authHeader.split(" ")[1];
-  console.log("\ntoken Middleware", token, "\n");
-
-  console.log("\ntoken request--", token);
-  // cookie.set(token, { expires: Date.now() });
-  // res.cookie(token, { expires: new Date(Date.now()) });
-  // res.clearCookie("name", { path: "/" });
-  // req.session.cookie.expires = true;
   res.cookie(token, { expires: new Date(Date.now() + 100) });
-
-  res.redirect("/login");
-});
-
-//test | see db content
-router.get("/msg", async (req, res) => {
-  try {
-    let messages = await Message.findAll({
-      include: User,
-      order: [["id", "DESC"]],
-    });
-    let data = { messages };
-
-    console.log("\nMessages: ", data, "\n");
-    console.log("\nMessages: ", JSON.stringify(data), "\n");
-    res.send(data);
-  } catch (e) {
-    console.error(e);
-  }
-});
-
-router.get("/users", async (req, res) => {
-  try {
-    let users = await User.findAll({});
-    let data = { users };
-
-    console.log("\nUsers: ", data, "\n");
-    res.send(data);
-  } catch (e) {
-    console.error(e);
-  }
+  dataMsg.msg = "";
+  res.render("login", dataMsg);
 });
 
 module.exports = router;
