@@ -13,40 +13,38 @@
         <%- include('./partials/left-col') %>
     <!-- left column end -->
         <div class="middle-col">
-<div class="create-tweet">
- <div class="home-title">
-     <!-- <h1 class="home-title">Home</h1> -->
-     <h1>HEY</h1>
+    <div class="create-tweet">
+    <div class="home-title">
+        <h1>HEY, </h1>
     <h2>welcome to the site</h2>
     <h3>the messaging site</h3>
-    <h4>make an account, login, post a message</h4>
- </div>
+    </div>
         <form action="/message" method="POST">
-          <div class="post-item">
-            <img src="images/avatar.jpeg" alt="" srcset="" class="avatar">
-            <input type="text" name="content" required placeholder="Send a message"> <br> <br>
-          </div>
-          <button type="submit">Send</button>
+            <div class="post-item">
+                <img src="images/avatar.jpeg" alt="" srcset="" class="avatar">
+                <input type="text" name="content" required placeholder="Send a message"> <br> <br>
+            </div>
+            <button type="submit">Send</button>
         </form>
-      </div>
+    </div>
             
     
             <h2>Messages</h2>
     
-            <% for (let message of locals.message) { %> 
+            <% for (let msg of locals.message) { %> 
                 <div class="tweet-content">
                     <div class="img-avatar">
                         <img src="images/avatar.jpeg" alt="" srcset="" class="avatar">
                     </div>
                     <div class="tweet">
-                        <b><%= message.dataValues.User.dataValues.username %> </b> <span><%= message.dataValues.createdAt.toDateString() %>, <%= message.dataValues.time %></span>
+                        <b><%= msg.dataValues.User.dataValues.username %> </b> <span><%= msg.dataValues.createdAt.toDateString() %>, <%= msg.dataValues.time %></span>
                         <p>
-                            <%= message.dataValues.content %> 
+                            <%= msg.dataValues.content %> 
                         </p>
                         <form action="/like" method="post">
-                            <input type="text" name="id" value='<%= message.dataValues.id %>'style="display:none">
+                            <input type="text" name="id" value='<%= msg.dataValues.id %>'style="display:none">
                             <button type="submit" id="like-btn">&#128077;</button>
-                            <span><%= message.dataValues.likes %></span>
+                            <span><%= msg.dataValues.likes %></span>
                             
                         </form>
                     </div>

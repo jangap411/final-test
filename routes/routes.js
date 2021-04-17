@@ -64,6 +64,7 @@ router.post("/login", async function (req, res) {
 
       let token = jwt.sign(data, "theSecret");
       res.cookie("token", token);
+      dataMsg.msg = "";
       res.redirect("/");
     } else {
       dataMsg.msg =

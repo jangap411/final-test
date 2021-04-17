@@ -107,12 +107,12 @@ button{
   outline: none;
   cursor: pointer;
 }
-#like-btn button{
+#like-btn{
   color: #fbfcfd;
-  padding: 10px 25px;
-  background:black;
+  padding: 5px 10px;
+  background: #fbfcfd;
   border: 1px solid #FFF;
-  border-radius: 20px;
+  border-radius: 50px;
   outline: none;
   cursor: pointer;
 }
