@@ -37,10 +37,10 @@ router.post("/createUser", async function (req, res) {
 
     if (user) {
       dataMsg.msg = "Account Created Please login";
-      res.redirect("/login", dataMsg);
+      res.redirect("/login");
     } else {
       dataMsg.msg = "Error creating account";
-      redirect("/login", dataMsg);
+      res.redirect("/login");
     }
   } catch (e) {
     console.log("\ncatch creating user", e, "\n");
