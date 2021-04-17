@@ -33,7 +33,7 @@
     
             <h2>Messages</h2>
     
-            <% for (let message of locals.messages) { %> 
+            <% for (let message of locals.message) { %> 
                 <div class="tweet-content">
                     <div class="img-avatar">
                         <img src="images/avatar.jpeg" alt="" srcset="" class="avatar">
@@ -44,8 +44,8 @@
                             <%= message.dataValues.content %> 
                         </p>
                         <form action="/like" method="post">
-                            1
                             <button type="submit" id="like-btn">&#128077;</button>
+                            1
                         </form>
                     </div>
                 </div>

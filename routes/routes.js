@@ -9,12 +9,14 @@ let dataMsg = {
 };
 
 router.get("/", async function (req, res) {
-  let messages = await Message.findAll({
+  let message = await Message.findAll({
     include: User,
     order: [["id", "DESC"]],
   });
 
-  let data = { messages };
+  let data = { message };
+
+  console.log("\nMessage data---->", data, "\n");
 
   res.render("index", data);
 });
@@ -35,7 +37,7 @@ router.post("/createUser", async function (req, res) {
 
     if (user) {
       dataMsg.msg = "Account Created Please login";
-      redirect("/login", dataMsg);
+      res.redirect("/login", dataMsg);
     } else {
       dataMsg.msg = "Error creating account";
       redirect("/login", dataMsg);
@@ -88,7 +90,8 @@ router.get("/message", async function (req, res) {
 });
 
 router.post("/message", async function (req, res) {
-  let { token } = res.cookies;
+  let { token } = req.cookies;
+  console.log("\nreq.body----->", req.body, "\nreq.cookies", req.cookies, "\n");
   let { content } = req.body;
   let timeCreated = new Date();
 
@@ -104,7 +107,7 @@ router.post("/message", async function (req, res) {
         let msg = await Message.create({
           content: content,
           time: timeCreated.toLocaleTimeString(),
-          userId: user.id,
+          UserId: user.id,
         });
 
         if (msg) {
