@@ -1,5 +1,4 @@
 # final-test
-# twitter-clone-exercise
 ### Deployment steps. 
 
 1. Clone the repository from, `https://github.com/jangap411/final-test.git` 
