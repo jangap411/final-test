@@ -8,13 +8,26 @@ let dataMsg = {
 };
 
 router.get("/", async function (req, res) {
-  let message = await Message.findAll({
-    include: User,
-    order: [["id", "DESC"]],
-  });
+  let { token } = req.cookies;
+  try {
+    let vToken = jwt.verify(token, "theSecret");
+    if (token) {
+      let message = await Message.findAll({
+        include: User,
+        order: [["id", "DESC"]],
+      });
 
-  let data = { message };
-  res.render("index", data);
+      let data = { message };
+      res.render("index", data);
+    } else {
+      dataMsg.msg = "Session token expired. please login again";
+      res.redirect("/login");
+    }
+  } catch (e) {
+    console.log("\nhome catch--->", e, "\n");
+    dataMsg.msg = "Session token expired. please login again";
+    res.redirect("/login");
+  }
 });
 
 router.get("/createUser", function (req, res) {
@@ -62,14 +75,13 @@ router.post("/login", async function (req, res) {
         userid: user.id,
       };
 
-      let token = jwt.sign(data, "theSecret");
+      let token = jwt.sign(data, "theSecret", { expiresIn: "10m" });
       res.cookie("token", token);
       dataMsg.msg = "";
       res.redirect("/");
     } else {
-      dataMsg.msg =
-        "Invalid Username or password.\nTry signup to access this site";
-      res.redirect("/login");
+      dataMsg.msg = "Invalid Username or password";
+      res.redirect("/");
     }
   } catch (e) {
     console.log("\ncatch login user", e, "\n");
@@ -84,22 +96,24 @@ router.get("/message", async function (req, res) {
   if (token) {
     res.render("message");
   } else {
-    dataMsg.msg = "Please login. your session has expired";
-    res.render("login", dataMsg);
+    dataMsg.msg = "Session expired. please login";
+    res.redirect("/login");
   }
 });
 
 router.post("/message", async function (req, res) {
   let { token } = req.cookies;
+  console.log("\nreq.body----->", req.body, "\nreq.cookies", req.cookies, "\n");
   let { content } = req.body;
   let timeCreated = new Date();
 
   try {
     if (token) {
       let payload = jwt.verify(token, "theSecret");
+      console.log("\nPayload verified:--->", payload, "\n");
 
       let user = await User.findOne({
-        where: { username: payload.username },
+        where: { id: payload.userid },
       });
 
       if (user) {
@@ -114,11 +128,15 @@ router.post("/message", async function (req, res) {
         } else {
           res.redirect("/error");
         }
+      } else {
+        res.redirect("/login");
       }
+    } else {
     }
   } catch (e) {
     console.error("\nCatch create message --->", e, "\n");
-    redirect("/error");
+    dataMsg.msg = "Session token expired. please login again";
+    res.redirect("/error");
   }
 });
 
@@ -157,9 +175,16 @@ router.post("/like", async (req, res) => {
 
 router.get("/logout", (req, res) => {
   const { token } = req.cookies;
-  res.cookie(token, { expires: new Date(Date.now() + 100) });
-  dataMsg.msg = "";
-  res.render("login", dataMsg);
+  // const authHeader = req.headers.Authorization;
+
+  console.log("\ntoken cookie-->", token, "\n");
+
+  // const token = authHeader && authHeader.split(" ")[1];
+  console.log("\ntoken Middleware", token, "\n");
+  let payload = jwt.verify(token, "theSecret");
+  res.cookie(payload, { expires: new Date(Date.now() - 100) });
+
+  res.redirect("/login");
 });
 
 module.exports = router;
