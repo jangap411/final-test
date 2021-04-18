@@ -81,7 +81,7 @@ router.post("/login", async function (req, res) {
       res.redirect("/");
     } else {
       dataMsg.msg = "Invalid Username or password";
-      res.redirect("/");
+      res.redirect("/login");
     }
   } catch (e) {
     console.log("\ncatch login user", e, "\n");
