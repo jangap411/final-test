@@ -6,3 +6,4 @@
 3. Type `npm i` in your terminal to install the required dependencies.
 4. In your terminal type `npm start` to run the project
 5. Type in `http://localhost:9090` in your browser to view the app.
+# final-test-part2
