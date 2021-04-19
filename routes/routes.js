@@ -174,16 +174,11 @@ router.post("/like", async (req, res) => {
 });
 
 router.get("/logout", (req, res) => {
+   //gets the session cookies
   const { token } = req.cookies;
-  // const authHeader = req.headers.Authorization;
-
-  console.log("\ntoken cookie-->", token, "\n");
-
-  // const token = authHeader && authHeader.split(" ")[1];
-  console.log("\ntoken Middleware", token, "\n");
-  let payload = jwt.verify(token, "theSecret");
-  res.cookie(payload, { expires: new Date(Date.now() - 100) });
-
+  //set expiration to a time in the past (100 sec)
+  res.cookie("token", token, { expires: new Date(Date.now() - 100) });
+  //redirects to login age
   res.redirect("/login");
 });
 
